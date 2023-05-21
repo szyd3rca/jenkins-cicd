@@ -149,42 +149,28 @@ resource "aws_instance" "jenkins-master" {
   key_name          = aws_key_pair.jenkins-key.id
   subnet_id         = aws_subnet.jenkins-master-subnet.id
 
-  /*connection {
-    host        = self.public_ip
-    user        = "piotrch"
-    private_key = file("C:/Users/piotrch/.ssh/id_rsa")
+  provisioner "file" {
+    source      = "install_jenkins.sh"
+    destination = "/tmp/install_jenkins.sh"
   }
-  provisioner "remote-exec" {
-    inline = ["sudo apt-get update & sudo apt install -y python3"]
-
-
 
   connection {
     type        = "ssh"
     user        = "ec2-user"
-    private_key = file("C:/Users/piotrch/.ssh/id_rsa")
+    private_key = file("~/.ssh/id_rsa")
     host        = aws_instance.jenkins-master.public_ip
   }
-*/
-  connection {
-    host        = self.public_ip
-    user        = "ec2-user"
-    private_key = file("~/.ssh/credentials")
 
-    provisioner "file" {
-      source      = "install_jenkins.sh"
-      destination = "/tmp/install_jenkins.sh"
-
-    }
-    provisioner "remote-exec" {
-      inline = [
-        "sudo chmod +x /tmp/install_jenkins.sh",
-        "sh /tmp/install_jenkins.sh",
-      ]
-    }
-    depends_on = [aws_instance.jenkins-master]
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chmod +x /tmp/install_jenkins.sh",
+      "sh /tmp/install_jenkins.sh",
+    ]
   }
+
+  depends_on = [aws_instance.jenkins-master]
 }
+
 
 resource "aws_instance" "jenkins-slave" {
   ami               = "ami-004359656ecac6a95"

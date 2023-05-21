@@ -5,12 +5,12 @@ variable "ssh_key" {
 }
 variable "secret_key" {
   description = "secret_key to aws"
-  type = string
-  default = ""
+  type        = string
+  default     = ""
 }
 variable "access_key" {
- description = "access_key to aws"
- type = string
- default = ""
-  
+  description = "access_key to aws"
+  type        = string
+  default     = ""
+
 }
