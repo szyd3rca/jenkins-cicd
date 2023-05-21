@@ -169,7 +169,7 @@ resource "aws_instance" "jenkins-master" {
   connection {
     host        = self.public_ip
     user        = "ec2-user"
-    private_key = file("C:/Users/piotrch/.ssh/id_rsa")
+    private_key = file("~/.ssh/credentials")
 
     provisioner "file" {
       source      = "install_jenkins.sh"
