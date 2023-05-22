@@ -45,7 +45,6 @@ resource "aws_network_acl" "jenkins-vpc-acl" {
     Name = "jenkins-acl"
   }
 }
-
 resource "aws_subnet" "jenkins-master-subnet" {
   vpc_id                  = aws_vpc.jenkins-prod.id
   cidr_block              = "10.0.1.0/24"
@@ -56,7 +55,6 @@ resource "aws_subnet" "jenkins-master-subnet" {
     Name = "jenkins-master-subnet"
   }
 }
-
 resource "aws_subnet" "jenkins-slave-subnet" {
   vpc_id            = aws_vpc.jenkins-prod.id
   cidr_block        = "10.0.2.0/24"
@@ -66,17 +64,14 @@ resource "aws_subnet" "jenkins-slave-subnet" {
     Name = "jenkins-slave-subnet"
   }
 }
-
 resource "aws_network_acl_association" "jenkins-master-subnet-acl" {
   subnet_id          = aws_subnet.jenkins-master-subnet.id
   network_acl_id     = aws_network_acl.jenkins-vpc-acl.id
 }
-
 resource "aws_network_acl_association" "jenkins-slave-subnet-acl" {
   subnet_id          = aws_subnet.jenkins-slave-subnet.id
   network_acl_id     = aws_network_acl.jenkins-vpc-acl.id
 }
-
 resource "aws_internet_gateway" "jenkins_igw" { #define IGW for master-subnet
   vpc_id = "${aws_vpc.jenkins-prod.id}"
   tags = {
@@ -198,3 +193,6 @@ resource "aws_network_interface_sg_attachment" "slave-attachment" {
 output "instance_ip_addr" {
   value = aws_instance.jenkins-master.public_ip
 }
+#git chechout add_button <- by wygenerować sdasdasdasda
+#git push < wrzuca sie branch do repo 
+#git merge < po sprawdzeniu kodu moze przekształcić 
