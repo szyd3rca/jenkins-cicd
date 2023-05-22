@@ -194,7 +194,18 @@ output "instance_ip_addr" {
   value = aws_instance.jenkins-master.public_ip
 }
 
-#git checkout add_button <- by wygenerować sdasdasdasda
+#git checkout add_button <- by wygenerować 
 #git push < wrzuca sie branch do repo 
 #git merge < po sprawdzeniu kodu moze przekształcić 
 #git remote update 
+
+#0 git clone (https lub ssh)
+#1 git pull --rebase origin {nazwa branch}
+#2 git checkout -b {nazwa nowego brancha np. data, funkcjonalność, fix}
+# wprowadzasz modyfikacje kodu
+#3 git add .  {nazwa pliku po spacji, spacja jako separator lub kropka dla wszystkich plikow} << tworzy lokalnego snapshota
+#4 git commit -m "nazwa zmiany" << zapisuje w/w snapshota
+#5 git pull --rebase origin {nazwa brancha} <<upewniasz sie czy masz najnowsza wersje by uniknac konfliktow 
+#6 git push -f << flaga force w przypadku problemow << wypycha branch do gita 
+
+#7 mozesz zmergowac branch do maina z poziomu githuba
