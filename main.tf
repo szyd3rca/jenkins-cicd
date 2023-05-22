@@ -193,6 +193,8 @@ resource "aws_network_interface_sg_attachment" "slave-attachment" {
 output "instance_ip_addr" {
   value = aws_instance.jenkins-master.public_ip
 }
-#git chechout add_button <- by wygenerować sdasdasdasda
+
+#git checkout add_button <- by wygenerować sdasdasdasda
 #git push < wrzuca sie branch do repo 
 #git merge < po sprawdzeniu kodu moze przekształcić 
+#git remote update 
