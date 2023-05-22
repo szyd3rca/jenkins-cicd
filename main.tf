@@ -206,6 +206,6 @@ output "instance_ip_addr" {
 #3 git add .  {nazwa pliku po spacji, spacja jako separator lub kropka dla wszystkich plikow} << tworzy lokalnego snapshota
 #4 git commit -m "nazwa zmiany" << zapisuje w/w snapshota
 #5 git pull --rebase origin {nazwa brancha} <<upewniasz sie czy masz najnowsza wersje by uniknac konfliktow 
-#6 git push -f << flaga force w przypadku problemow << wypycha branch do gita 
+#6 git push origin {nazwa brancha} -f <<  flaga force w przypadku problemow << wypycha branch do gita 
 
-#7 mozesz zmergowac branch do maina z poziomu githuba
+#7 mozesz zmergowac branch do maina z poziomu
