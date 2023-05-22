@@ -1,12 +1,18 @@
-resource "aws_key_pair" "jenkins-key" {
-  key_name   = "jenkins_master"
-  public_key = var.ssh_key
+resource "aws_key_pair" "jenkins-key" { #import the RSA Key 
+  key_name   = "jenkins-master-key"
+  public_key = tls_private_key.rsa.public_key_openssh
 }
-
+resource "tls_private_key" "rsa" {#generate the RSA key
+  algorithm = "RSA"
+  rsa_bits = 4096 
+}
+resource "local_file" "jenkins-master-key" {#write private .pem file to local_file on executor's machine
+  content = tls_private_key.rsa.private_key_pem
+  filename = "tfkey"
+  
+}
 resource "aws_vpc" "jenkins-prod" { #define VPC
   cidr_block = "10.0.0.0/16"
-
-
 }
 resource "aws_network_acl" "jenkins-vpc-acl" {
   vpc_id = aws_vpc.jenkins-prod.id
@@ -146,9 +152,9 @@ resource "aws_instance" "jenkins-master" {
   ami               = "ami-004359656ecac6a95"
   instance_type     = "t2.micro"
   availability_zone = "eu-central-1a"
-  key_name          = aws_key_pair.jenkins-key.id
+  key_name          = "jenkins-master-key"
   subnet_id         = aws_subnet.jenkins-master-subnet.id
-
+/*
   provisioner "file" {
     source      = "install_jenkins.sh"
     destination = "/tmp/install_jenkins.sh"
@@ -169,9 +175,9 @@ resource "aws_instance" "jenkins-master" {
   }
 
   depends_on = [aws_instance.jenkins-master]
+
+*/
 }
-
-
 resource "aws_instance" "jenkins-slave" {
   ami               = "ami-004359656ecac6a95"
   instance_type     = "t2.micro"
