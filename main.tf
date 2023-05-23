@@ -1,16 +1,37 @@
-resource "aws_key_pair" "jenkins-master-key" { #import the RSA Key 
-  key_name   = "jenkins-master-key"
-  public_key = tls_private_key.rsa.public_key_openssh
-}
-resource "tls_private_key" "rsa" {#generate the RSA key
+resource "tls_private_key" "rsa-master" {#generate the RSA key for master
   algorithm = "RSA"
   rsa_bits = 4096 
 }
-resource "local_file" "jenkins-master-key" {#write private .pem file to local_file on executor's machine
-  content = tls_private_key.rsa.private_key_pem
-  filename = "tfkey"
-  
+resource "aws_key_pair" "jenkins-master-key" { #import the RSA Key 
+  key_name   = "jenkins-master-key"
+  public_key = tls_private_key.rsa-master.public_key_openssh
+  depends_on = [ tls_private_key.rsa-master ]
 }
+
+resource "local_file" "jenkins-master-key" {#write private .pem file to local_file on executor's machine
+  content = tls_private_key.rsa-master.private_key_pem
+  filename = "tfkey-master"
+  depends_on = [ tls_private_key.rsa-master ]
+}
+
+resource "tls_private_key" "rsa-slave" {#generate the RSA key for slave
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "jenkins-slave-key" {
+  key_name   = "jenkins-slave-key"
+  public_key = tls_private_key.rsa-slave.public_key_openssh
+  depends_on = [tls_private_key.rsa-slave]
+}
+
+resource "local_file" "jenkins-slave-key" {
+  content     = tls_private_key.rsa-slave.private_key_pem
+  filename    = "tfkey-slave"
+  depends_on  = [tls_private_key.rsa-slave]
+}
+
+
 resource "aws_vpc" "jenkins-prod" { #define VPC
   cidr_block = "10.0.0.0/16"
     tags = {
@@ -49,7 +70,7 @@ resource "aws_subnet" "jenkins-master-subnet" {
   vpc_id                  = aws_vpc.jenkins-prod.id
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "eu-central-1a"
-  map_public_ip_on_launch = true
+  
   
   tags = {
     Name = "jenkins-master-subnet"
@@ -157,14 +178,15 @@ resource "aws_security_group" "jenkins-slave-sg" {
 
 }
 resource "aws_instance" "jenkins-master" {
-  ami               = "ami-004359656ecac6a95"
+  ami               = "ami-047decd705ef4b0eb"
   instance_type     = "t2.micro"
   availability_zone = "eu-central-1a"
+  subnet_id = aws_subnet.jenkins-master-subnet.id
   key_name          = "jenkins-master-key"
-  subnet_id         = aws_subnet.jenkins-slave-subnet.id
   associate_public_ip_address = true
+ } 
   
-
+/*
   connection {
     host = self.public_ip
 		user = "ec2-user"
@@ -174,22 +196,28 @@ resource "aws_instance" "jenkins-master" {
   provisioner "remote-exec" {
 		inline = ["sudo apt-get update & sudo apt install -y python3"]
   }
+  
 }
+*/
 resource "aws_network_interface_sg_attachment" "master-attachment" {
   security_group_id = aws_security_group.jenkins-master-sg.id
   network_interface_id = aws_instance.jenkins-master.primary_network_interface_id
 }
+
 resource "aws_instance" "jenkins-slave" {
   ami               = "ami-004359656ecac6a95"
   instance_type     = "t2.micro"
   availability_zone = "eu-central-1a"
+  key_name = "jenkins-slave-key"
   subnet_id         = aws_subnet.jenkins-slave-subnet.id
   
 }
+
 resource "aws_network_interface_sg_attachment" "slave-attachment" {
   security_group_id = aws_security_group.jenkins-slave-sg.id
   network_interface_id = aws_instance.jenkins-slave.primary_network_interface_id
 }
+
 output "instance_ip_addr" {
   value = aws_instance.jenkins-master.public_ip
 }
