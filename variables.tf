@@ -12,5 +12,7 @@ variable "access_key" {
   description = "access_key to aws"
   type        = string
   default     = ""
-
+}
+variable "private_key_path" {
+  default = "/Users/admin/Desktop/jenkins-cicd/jenkins-cicd/tfkey-master"
 }
